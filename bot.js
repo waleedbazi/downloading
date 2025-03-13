@@ -6,7 +6,7 @@ const bot = new Telegraf('2036348448:AAFJc-pLAdoOgO3eEg5CxvwpUCUfAH2BZp4');
 
 // کۆدی لۆگین و داگرتن بە Puppeteer
 async function downloadInstagramVideo(url, username, password) {
-    const browser = await puppeteer.launch({ headless: true });
+    const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox', '--disable-setuid-sandbox'] });
     const page = await browser.newPage();
 
     // لۆگین بە username و password
@@ -40,7 +40,7 @@ bot.on('text', async (ctx) => {
             ctx.reply('لطفاً لینک ڤیدیۆی ئینستاگرام بنێرە.');
         }
     } catch (error) {
-        console.error(error);
+        console.error('Error:', error);
         ctx.reply('هەڵەیەک ڕوویدا، تکایە دووبارە هەوڵبدە.');
     }
 });
