@@ -1,40 +1,48 @@
 const { Telegraf } = require('telegraf');
 const puppeteer = require('puppeteer');
 
+// Token بۆ بوتی تێلیگرام
 const bot = new Telegraf('2036348448:AAFJc-pLAdoOgO3eEg5CxvwpUCUfAH2BZp4');
 
-bot.start((ctx) => ctx.reply('سڵاو! تکایە لینکەکانی ڤیدیۆی ئینستاگرام بنێرە'));
+// کۆدی لۆگین و داگرتن بە Puppeteer
+async function downloadInstagramVideo(url, username, password) {
+    const browser = await puppeteer.launch({ headless: true });
+    const page = await browser.newPage();
 
+    // لۆگین بە username و password
+    await page.goto('https://www.instagram.com/accounts/login/');
+    await page.waitForSelector('input[name="username"]');
+    await page.type('input[name="username"]', username);
+    await page.type('input[name="password"]', password);
+    await page.click('button[type="submit"]');
+    await page.waitForNavigation({ waitUntil: 'networkidle0' });
+
+    // ڤیدیۆ دابگرە
+    await page.goto(url);
+    const videoUrl = await page.$eval('video', (video) => video.src);
+
+    await browser.close();
+    return videoUrl;
+}
+
+// فەرمی داواکاری تێلیگرام
 bot.on('text', async (ctx) => {
-  const url = ctx.message.text;
-  
-  if (url.includes('instagram.com')) {
+    const url = ctx.message.text;
+    const user = 'waleedbarwary';
+    const pass = 'WALEED123@&W';
+
     try {
-      // لۆگین بە username/password بۆ ڤیدیۆی پرایڤەیت
-      const browser = await puppeteer.launch();
-      const page = await browser.newPage();
-
-      // لۆگین کردن
-      await page.goto('https://www.instagram.com/accounts/login/');
-      await page.type('input[name="username"]', 'YOUR_USERNAME');
-      await page.type('input[name="password"]', 'YOUR_PASSWORD');
-      await page.click('button[type="submit"]');
-      await page.waitForNavigation();
-
-      // گەڕان بۆ لینک و دابگرن
-      await page.goto(url);
-      const videoUrl = await page.$eval('video', el => el.src);
-
-      // ڤیدیۆی دابگرە و بە تێلیگرام بفرێنە
-      await ctx.replyWithVideo(videoUrl);
-      await browser.close();
+        if (url.includes('instagram.com')) {
+            // ڤیدیۆ دابگرێ
+            const videoUrl = await downloadInstagramVideo(url, user, pass);
+            ctx.reply(`ڤیدیۆ بەسەرکەوتویی دابرا: ${videoUrl}`);
+        } else {
+            ctx.reply('لطفاً لینک ڤیدیۆی ئینستاگرام بنێرە.');
+        }
     } catch (error) {
-      console.error(error);
-      await ctx.reply('هەڵەیەک ڕوویدا. تکایە دوبارە هەوڵبدە');
+        console.error(error);
+        ctx.reply('هەڵەیەک ڕوویدا، تکایە دووبارە هەوڵبدە.');
     }
-  } else {
-    await ctx.reply('تکایە لینکەکانی ڤیدیۆی ئینستاگرام بنێرە');
-  }
 });
 
 bot.launch();
