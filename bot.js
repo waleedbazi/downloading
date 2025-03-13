@@ -7,16 +7,16 @@ const bot = new Telegraf('2036348448:AAFJc-pLAdoOgO3eEg5CxvwpUCUfAH2BZp4');
 // فەرمی API تایبەتی بۆ داگرتنی ڤیدیۆی رێلز
 const downloadInstagramReels = async (url) => {
     try {
-        // پەیوەندیدانی URL بە API ی reelsaver.net
-        const response = await axios.get(`https://reelsaver.net/api/instagram`, {
+        // پەیوەندیدانی URL بە API ی snapinsta.app
+        const response = await axios.get(`https://snapinsta.app/api/v1/download`, {
             params: {
                 url: url, // لینک رێل
             }
         });
 
         // ئەگەر API وەڵامە بە شێوەی دروست بەدەست هێنرابێت
-        if (response.data && response.data.status === 'success') {
-            const videoUrl = response.data.data.url;
+        if (response.data && response.data.success) {
+            const videoUrl = response.data.download_url;
             return videoUrl;
         } else {
             return 'هەڵەیەک ڕوویدا';
@@ -37,6 +37,11 @@ bot.on('text', async (ctx) => {
     } else {
         ctx.reply('لطفاً لینک ڤیدیۆی رێلز ئینستاگرام بنێرە.');
     }
+});
+
+// چێککردنی هەڵەکان
+bot.catch((err) => {
+    console.error('Bot Error:', err);
 });
 
 bot.launch();
