@@ -39,9 +39,7 @@ bot.on('text', async (ctx) => {
     }
 });
 
-// چێککردنی هەڵەکان
-bot.catch((err) => {
+// چێککردنی هەڵەکان و چاکسازی launch
+bot.launch().catch((err) => {
     console.error('Bot Error:', err);
 });
-
-bot.launch();
